@@ -1,0 +1,71 @@
+---
+
+- name: Config as Code for AAP
+  hosts: localhost
+  gather_facts: false
+  vars:
+    controller_user: admin
+    controller_pass: admin
+  
+  tasks:
+  - name: Bring in credentials variable
+    include_vars:
+      file: cred.yaml
+    run_once: true
+
+  - name: Manage credentials
+    ansible.controller.credential:
+      controller_host: "https://{{ ansible_host }}"
+      controller_username: "{{ controller_user }}"
+      controller_password: "{{ controller_pass }}"
+      name: "{{ item.name }}"
+      organization: "{{ item.org }}"
+      description: Added by automation
+      credential_type: "{{ item.type }}"
+      state: "{{ item.state }}"
+      inputs:
+      # secret key
+        password: "{{ item.password }}"
+      # access key
+        username: "{{ item.username }}"
+      validate_certs: false
+    loop: "{{ creds }}"
+
+  - name: bring in inventory variables
+    include_vars:
+      file: inventory.yml
+    run_once: true
+
+  - name: manage inventories
+    ansible.controller.inventory:
+      controller_host: "https://{{ ansible_host }}"
+      controller_username: "{{ controller_user }}"
+      controller_password: "{{ controller_pass }}"
+      name: "{{ item.name }}"
+      description: Added by automation
+      state: "{{ item.state }}"
+      organization: "{{ item.org }}"
+      validate_certs: false
+    loop: "{{ inv_var }}"
+
+  - name: bring in inventory source variables
+    include_vars:
+      file: inventory_source.yml
+    run_once: true
+
+  - name: manage inventory sources
+    ansible.controller.inventory_source:
+      controller_host: "https://{{ ansible_host }}"
+      controller_username: "{{ controller_user }}"
+      controller_password: "{{ controller_pass }}"
+      name: "{{ item.name }}"
+      description: Added via automation
+      inventory: "{{ item.inventory_name }}"
+      credential: "{{ item.inventory_credential }}"
+      overwrite: True
+      update_on_launch: True
+      source: "{{ item.source }}"
+#      source_vars:
+#        private: false
+      validate_certs: false
+    loop: "{{ inv_source }}"
