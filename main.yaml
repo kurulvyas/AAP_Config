@@ -4,8 +4,8 @@
   connection: local
   gather_facts: false
   vars:
-    controller_user: admin
-    controller_pass: admin
+    controller_user: "admin"
+    controller_pass: "admin"
     controller_host: "https://localhost"
 
   tasks:
