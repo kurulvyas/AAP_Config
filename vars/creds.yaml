@@ -1,4 +1,5 @@
 ---
+
 creds:
   - name: EC2-Cred1
     type: Amazon Web Services
